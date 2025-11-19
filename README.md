@@ -47,7 +47,7 @@ FILEINFO BAS BPRG B   2751  50,51
 
 Free space: 2 granules (4608 bytes)
 Unused space (lost to granule rounding, etc): 20210 bytes
-
+````
 ---
 
 ## rsdos_dirsort.py
@@ -102,7 +102,6 @@ FILE1: [32]
 Entry 1: name='FILE2', ext='TXT', first_gran=33, bytes_last=2304, raw0=70
 	Accepted as valid file entry.
 FILE2: [33, 34]
-...
 
 Summary:
 	Files found: 14
