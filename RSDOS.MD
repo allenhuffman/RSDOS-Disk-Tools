@@ -40,7 +40,12 @@ Track X
 
 ## Granules
 
-RS-DOS divides the disk up into half-track sized granules (2304 bytes each) numbered 0-67:
+RS-DOS divides the disk up into half-track sized granules (2304 bytes each) numbered 0-67.
+
+Granules 0-33 are on Tracks 0-17.
+Granules 34-67 are on Tracks 18-34.
+
+Any routines accessing granules need to take this into consideration.
 
 ```
 Track 00 +------------+
