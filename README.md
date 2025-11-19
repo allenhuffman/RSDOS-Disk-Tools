@@ -30,8 +30,6 @@ FAT Table:
 20: C1 22 C1 C9 25 26 C2 28 29 2A 2B 2C 2D C5 C1 30
 30: C8 C1 33 C2 35 36 37 38 39 3A 3B 3C 3D 3E 3F 40
 40: 41 42 43 0D
-
-FILENAME EXT TYPE T   SIZE  GRANULES
 ------------------------------------
 1        TXT BDAT B      1  32
 2304     TXT BDAT B   2304  33,34
@@ -49,7 +47,6 @@ FILEINFO BAS BPRG B   2751  50,51
 
 Free space: 2 granules (4608 bytes)
 Unused space (lost to granule rounding, etc): 20210 bytes
-```
 
 ---
 
@@ -72,6 +69,53 @@ python rsdos_dirsort.py TEST.DSK --inplace
 
 ---
 
+## rsdos_check.py
+
+Checks RS-DOS disk images for directory and granule chain errors, orphaned granules, multiply-used granules, and provides a summary of disk health.
+
+### Usage
+```
+python rsdos_check.py <disk.dsk>
+```
+
+### Features
+- Validates directory entries
+- Detects granule chain loops and out-of-bounds errors
+- Reports orphaned granules (not used by any file)
+- Reports multiply-used granules (shared by more than one file)
+- Displays FAT table and per-file granule chains
+- Summarizes file count, used/free granules, and errors
+
+### Example Output
+```
+FAT Table:
+00: FF FF 03 C1 05 02 07 04 09 06 0B 08 C1 0A 0F 0C
+10: 11 0E 13 10 15 12 17 14 19 16 C6 18 1D 1A 1F C7
+20: C1 22 C1 C9 25 26 C2 28 29 2A 2B 2C 2D C5 C1 30
+30: C8 C1 33 C2 35 36 37 38 39 3A 3B 3C 3D 3E 3F 40
+40: 41 42 43 0D
+
+Checking TEST.DSK...
+Entry 0: name='FILE1', ext='TXT', first_gran=32, bytes_last=42, raw0=70
+	Accepted as valid file entry.
+FILE1: [32]
+Entry 1: name='FILE2', ext='TXT', first_gran=33, bytes_last=2304, raw0=70
+	Accepted as valid file entry.
+FILE2: [33, 34]
+...
+
+Summary:
+	Files found: 14
+	Used granules: 38
+	Free granules: 2
+	Orphaned granules: [12, 27]
+	Multiply-used granules: [5]
+	Total granules: 68
+	Granule usage: [0, 1, 1, 1, 1, 2, ...]
+```
+
+---
+
 ## rsdos_defrag.py
 
 Defragments RS-DOS disk image granules, making file data contiguous and reducing fragmentation.
@@ -89,7 +133,36 @@ python rsdos_defrag.py TEST.DSK --output defragged.dsk
 python rsdos_defrag.py TEST.DSK --inplace
 ```
 
-(Currently a scaffold; defrag logic to be implemented.)
+#### Before
+```
+FAT Table:
+00: FF FF 03 C1 05 02 07 04 09 06 0B 08 C1 0A 0F 0C
+10: 11 0E 13 10 15 12 17 14 19 16 C6 18 1D 1A 1F C7
+20: C1 22 C1 C9 25 26 C2 28 29 2A 2B 2C 2D C5 C1 30
+30: C8 C1 33 C2 35 36 37 38 39 3A 3B 3C 3D 3E 3F 40
+40: 41 42 43 0D
+
+FILENAME EXT TYPE T   SIZE  GRANULES
+------------------------------------
+1        TXT BDAT B      1  32
+2304     TXT BDAT B   2304  33,34
+2303     TXT BDAT B   2303  35
+4000     TXT BDAT B   4000  30,31
+5000     TXT BDAT B   5000  36,37,38
+6000     TXT BDAT B   6000  28,29,26
+15000    TXT BDAT B  15000  39,40,41,42,43,44,45
+30000    TXT BDAT B  30000  27,24,25,22,23,20,21,18,19,16,17,14,15,12
+42       TXT BDAT B     42  46
+4242     TXT BDAT B   4242  47,48
+MAKEFILE BAS BPRG B    211  49
+FILEINFO BAS BPRG B   2751  50,51
+60000    TXT BDAT B  60000  52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,13,10,11,8,9,6,7,4,5,2,3
+
+Free space: 2 granules (4608 bytes)
+Unused space (lost to granule rounding, etc): 20210 bytes
+```
+
+#### After
 
 ---
 

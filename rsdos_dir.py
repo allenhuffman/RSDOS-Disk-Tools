@@ -32,26 +32,26 @@ def parse_directory(data, fat):
             if entry[0] == 0:
                 continue  # Deleted file
             
-            # Filename (8 bytes, ASCII)
+            # Filename (bytes 0-7, 8 bytes, ASCII)
             name = entry[0:8].decode('ascii', errors='ignore').rstrip()
             
-            # Extension (3 bytes, ASCII)
+            # Extension (bytes 8-10, 3 bytes, ASCII)
             ext = entry[8:11].decode('ascii', errors='ignore').rstrip()
             
-            # File type (byte 12)
+            # File type (byte 11)
             file_type = entry[11]
             type_strings = {0: 'BPRG', 1: 'BDAT', 2: 'M/L ', 3: 'TEXT'}
             type_str = type_strings.get(file_type, str(file_type))
             
-            # ASCII flag (byte 13)
+            # ASCII flag (byte 12)
             ascii_flag = entry[12]
             ascii_str = {0:"B", 1:"A"}.get(ascii_flag, str(ascii_flag))
 
-            # First granule (byte 14)
+            # First granule (byte 13)
             first_gran = entry[13]
             
-            # Bytes used in last sector (bytes 15-16, little endian)
-            bytes_last = entry[15] + entry[16] * 256
+            # Bytes used in last sector (bytes 14-15, big endian)
+            bytes_last = entry[14] * 256 + entry[15]
             
             # Calculate file size in bytes (RS-DOS logic)
             size = 0
@@ -60,7 +60,11 @@ def parse_directory(data, fat):
                 if gn > 67 or gn < 0:
                     break  # Invalid granule
                 gv = fat[gn]
-                if gv < 192:
+                if gv == 0:
+                    # Last granule, only bytes_last used
+                    size += bytes_last
+                    break
+                elif gv < 192:
                     size += 2304
                     gn = gv
                 else:
