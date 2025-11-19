@@ -9,9 +9,20 @@ A collection of Python utilities for parsing, analyzing, and manipulating RS-DOS
 - Free space and unused space calculation
 - Extensible for future RS-DOS disk utilities
 
+## Utilities
+
+### rsdos_dir.py
+Parses and displays RS-DOS disk directory listings, file sizes, types, ASCII/BIN flags, FAT table, granule chains, free space, and unused space.
+
+### rsdos_dirsort.py
+Sorts RS-DOS directory entries alphabetically in a disk image.
+- `--output <new.dsk>`: Write sorted disk image to a new file
+- `--inplace`: Update the original disk image in place (backup created)
+
 ## Usage
 ```
 python rsdos_dir.py [--fat] [--granules] <disk.dsk>
+python rsdos_dirsort.py <disk.dsk> [--output <new.dsk>] [--inplace]
 ```
 
 - `--fat`      Show FAT table
