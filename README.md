@@ -9,26 +9,20 @@ A collection of Python utilities for parsing, analyzing, and manipulating RS-DOS
 - Free space and unused space calculation
 - Extensible for future RS-DOS disk utilities
 
-## Utilities
+---
 
-### rsdos_dir.py
+## rsdos_dir.py
+
 Parses and displays RS-DOS disk directory listings, file sizes, types, ASCII/BIN flags, FAT table, granule chains, free space, and unused space.
 
-### rsdos_dirsort.py
-Sorts RS-DOS directory entries alphabetically in a disk image.
-- `--output <new.dsk>`: Write sorted disk image to a new file
-- `--inplace`: Update the original disk image in place (backup created)
-
-## Usage
+### Usage
 ```
 python rsdos_dir.py [--fat] [--granules] <disk.dsk>
-python rsdos_dirsort.py <disk.dsk> [--output <new.dsk>] [--inplace]
 ```
-
 - `--fat`      Show FAT table
 - `--granules` Show granule chain for each file
 
-## Example Output
+### Example Output
 ```
 FAT Table:
 00: FF FF 03 C1 05 02 07 04 09 06 0B 08 C1 0A 0F 0C
@@ -56,6 +50,27 @@ FILEINFO BAS BPRG B   2751  50,51
 Free space: 2 granules (4608 bytes)
 Unused space (lost to granule rounding, etc): 20210 bytes
 ```
+
+---
+
+## rsdos_dirsort.py
+
+Sorts RS-DOS directory entries alphabetically in a disk image.
+
+### Usage
+```
+python rsdos_dirsort.py <disk.dsk> [--output <new.dsk>] [--inplace]
+```
+- `--output <new.dsk>`: Write sorted disk image to a new file
+- `--inplace`: Update the original disk image in place (backup created)
+
+### Example
+```
+python rsdos_dirsort.py TEST.DSK --output sorted.dsk
+python rsdos_dirsort.py TEST.DSK --inplace
+```
+
+---
 
 ## Future Plans
 - Disk image editing
