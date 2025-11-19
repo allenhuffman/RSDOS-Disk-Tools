@@ -43,6 +43,10 @@ def parse_directory(data, fat):
             type_strings = {0: 'BPRG', 1: 'BDAT', 2: 'M/L ', 3: 'TEXT'}
             type_str = type_strings.get(file_type, str(file_type))
             
+            # ASCII flag (byte 13)
+            ascii_flag = entry[12]
+            ascii_str = {0:"B", 1:"A"}.get(ascii_flag, str(ascii_flag))
+
             # First granule (byte 14)
             first_gran = entry[13]
             
@@ -70,6 +74,7 @@ def parse_directory(data, fat):
                 'name': name,
                 'ext': ext,
                 'type': type_str,
+                'ascii_flag': 'A' if ascii_flag == 1 else 'B',
                 'size': size
             })
     return entries
@@ -105,10 +110,10 @@ def main():
         print("No files found in directory.")
         return
     
-    print("Directory listing:")
-    print("-" * 40)
+    print("FILENAME EXT TYPE T   SIZE")
+    print("--------------------------")
     for entry in entries:
-        print(f"{entry['name']:<8} {entry['ext']:<3} {entry['type']} {entry['size']:>8} bytes")
+        print(f"{entry['name']:<8} {entry['ext']:<3} {entry['type']:<4} {entry['ascii_flag']:<1} {entry['size']:>6}")
 
 if __name__ == "__main__":
     main()
