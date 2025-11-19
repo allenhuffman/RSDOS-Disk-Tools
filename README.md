@@ -72,6 +72,27 @@ python rsdos_dirsort.py TEST.DSK --inplace
 
 ---
 
+## rsdos_defrag.py
+
+Defragments RS-DOS disk image granules, making file data contiguous and reducing fragmentation.
+
+### Usage
+```
+python rsdos_defrag.py <disk.dsk> [--output <defragged.dsk>] [--inplace]
+```
+- `--output <defragged.dsk>`: Write defragmented disk image to a new file
+- `--inplace`: Update the original disk image in place (backup created)
+
+### Example
+```
+python rsdos_defrag.py TEST.DSK --output defragged.dsk
+python rsdos_defrag.py TEST.DSK --inplace
+```
+
+(Currently a scaffold; defrag logic to be implemented.)
+
+---
+
 ## Future Plans
 - Disk image editing
 - File extraction/insertion
