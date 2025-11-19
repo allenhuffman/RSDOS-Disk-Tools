@@ -75,16 +75,44 @@ def parse_directory(data, fat):
                 'ext': ext,
                 'type': type_str,
                 'ascii_flag': 'A' if ascii_flag == 1 else 'B',
-                'size': size
+                'size': size,
+                'first_gran': first_gran
             })
     return entries
 
+def print_fat(fat):
+    print("FAT Table:")
+    for i in range(0, len(fat), 16):
+        chunk = fat[i:i+16]
+        hex_bytes = ' '.join(f"{b:02X}" for b in chunk)
+        print(f"{i:02X}: {hex_bytes}")
+
+def get_granule_chain(fat, first_gran):
+    chain = []
+    gn = first_gran
+    while True:
+        if gn > 67 or gn < 0:
+            break
+        chain.append(gn)
+        gv = fat[gn]
+        if gv >= 192:
+            break
+        gn = gv
+    return chain
+
 def main():
-    if len(sys.argv) != 2:
-        print("Usage: python rsdos_dir.py <disk.dsk>")
-        sys.exit(1)
-    
-    filename = sys.argv[1]
+    import argparse
+    parser = argparse.ArgumentParser(description="RS-DOS Disk Directory Parser")
+    parser.add_argument("disk", nargs="?", help="Disk image file (.dsk)")
+    parser.add_argument("--fat", "-f", action="store_true", help="Show FAT table")
+    parser.add_argument("--granules", "-g", action="store_true", help="Show granule chain for each file")
+    args = parser.parse_args()
+
+    if not args.disk:
+        parser.print_help()
+        return
+
+    filename = args.disk
     try:
         with open(filename, 'rb') as f:
             data = f.read()
@@ -94,29 +122,45 @@ def main():
     except Exception as e:
         print(f"Error reading file: {e}")
         sys.exit(1)
-    
-    # Check if file is large enough (minimum disk size for 35 tracks)
+
     min_size = 35 * 18 * 256  # 161,280 bytes
     if len(data) < min_size:
         print(f"Warning: File size {len(data)} bytes is smaller than expected {min_size} bytes for a 35-track disk.")
-    
-    # Read FAT (track 17, sector 2, bytes 0-67)
+
     fat_offset = 17 * 18 * 256 + (2 - 1) * 256  # 78848
     fat = data[fat_offset:fat_offset + 68]
-    
+
+    if args.fat:
+        print_fat(fat)
+        print()
+
     entries = parse_directory(data, fat)
-    
+
     if not entries:
         print("No files found in directory.")
         return
-    
-    print("FILENAME EXT TYPE T   SIZE")
-    print("--------------------------")
-    for entry in entries:
-        print(f"{entry['name']:<8} {entry['ext']:<3} {entry['type']:<4} {entry['ascii_flag']:<1} {entry['size']:>6}")
 
+    header = "FILENAME EXT TYPE T   SIZE"
+    if args.granules:
+        header += "  GRANULES"
+    print(header)
+    print("-" * len(header))
+    for entry in entries:
+        line = f"{entry['name']:<8} {entry['ext']:<3} {entry['type']:<4} {entry['ascii_flag']:<1} {entry['size']:>6}"
+        if args.granules:
+            granule_chain = get_granule_chain(fat, entry['first_gran'])
+            line += "  " + ",".join(str(g) for g in granule_chain)
+        print(line)
+
+    # Calculate free space
+    free_granules = sum(1 for g in fat if g == 255)
+    free_bytes = free_granules * 2304
+    print(f"\nFree space: {free_granules} granules ({free_bytes} bytes)")
+
+    # Calculate unused space (disk capacity - sum of file sizes - free space)
+    disk_capacity = 68 * 2304  # 68 granules per disk
+    used_bytes = sum(entry['size'] for entry in entries)
+    unused_bytes = disk_capacity - used_bytes - free_bytes
+    print(f"Unused space (lost to granule rounding, etc): {unused_bytes} bytes")
 if __name__ == "__main__":
     main()
-
-# End of script
-# You can now run: python3 rsdos_dir.py TEST.DSK
