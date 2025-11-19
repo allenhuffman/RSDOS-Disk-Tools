@@ -31,54 +31,56 @@ def parse_directory(data, fat):
                 return entries  # End of directory
             if entry[0] == 0:
                 continue  # Deleted file
-            
+
             # Filename (bytes 0-7, 8 bytes, ASCII)
             name = entry[0:8].decode('ascii', errors='ignore').rstrip()
-            
+
             # Extension (bytes 8-10, 3 bytes, ASCII)
             ext = entry[8:11].decode('ascii', errors='ignore').rstrip()
-            
+
             # File type (byte 11)
             file_type = entry[11]
             type_strings = {0: 'BPRG', 1: 'BDAT', 2: 'M/L ', 3: 'TEXT'}
             type_str = type_strings.get(file_type, str(file_type))
-            
+
             # ASCII flag (byte 12)
             ascii_flag = entry[12]
-            ascii_str = {0:"B", 1:"A"}.get(ascii_flag, str(ascii_flag))
+            ascii_str = 'A' if ascii_flag == 255 else 'B'
 
-            # First granule (byte 13)
+            # First granule (byte 13, 0-67)
             first_gran = entry[13]
-            
             # Bytes used in last sector (bytes 14-15, big endian)
             bytes_last = entry[14] * 256 + entry[15]
-            
+
             # Calculate file size in bytes (RS-DOS logic)
-            size = 0
-            gn = first_gran
-            while True:
-                if gn > 67 or gn < 0:
-                    break  # Invalid granule
-                gv = fat[gn]
-                if gv == 0:
-                    # Last granule, only bytes_last used
-                    size += bytes_last
-                    break
-                elif gv < 192:
-                    size += 2304
-                    gn = gv
-                else:
-                    sectors_used = gv & 0x1F
-                    if sectors_used > 0:
-                        sectors_used -= 1
-                    size += sectors_used * 256 + bytes_last
-                    break
-            
+            if 0 <= first_gran <= 67:
+                size = 0
+                gn = first_gran  # 0-based index for FAT
+                while True:
+                    if gn > 67 or gn < 0:
+                        break  # Invalid granule
+                    gv = fat[gn]
+                    if gv == 0:
+                        # Last granule, only bytes_last used
+                        size += bytes_last
+                        break
+                    elif gv < 192:
+                        size += 2304
+                        gn = gv  # Next granule
+                    else:
+                        sectors_used = gv & 0x1F
+                        if sectors_used > 0:
+                            sectors_used -= 1
+                        size += sectors_used * 256 + bytes_last
+                        break
+            else:
+                continue  # Invalid granule number
+
             entries.append({
                 'name': name,
                 'ext': ext,
                 'type': type_str,
-                'ascii_flag': 'A' if ascii_flag == 1 else 'B',
+                'ascii_flag': ascii_str,
                 'size': size,
                 'first_gran': first_gran
             })
@@ -93,15 +95,15 @@ def print_fat(fat):
 
 def get_granule_chain(fat, first_gran):
     chain = []
-    gn = first_gran
+    gn = first_gran  # 0-based index
     while True:
         if gn > 67 or gn < 0:
             break
-        chain.append(gn)
+        chain.append(gn)  # Show as 0-based granule number
         gv = fat[gn]
         if gv >= 192:
             break
-        gn = gv
+        gn = gv  # Next granule
     return chain
 
 def main():

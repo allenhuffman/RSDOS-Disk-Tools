@@ -22,8 +22,18 @@ NUM_ENTRIES = 72    # 9 sectors * 8 entries
 
 
 def read_directory(data):
-    dir_data = data[DIR_START:DIR_START + DIR_SIZE]
-    entries = [dir_data[i*ENTRY_SIZE:(i+1)*ENTRY_SIZE] for i in range(NUM_ENTRIES)]
+    entries = []
+    # Track 17, sectors 3-11
+    for sector in range(3, 12):
+        sector_offset = 17 * 18 * 256 + (sector - 1) * 256
+        sector_data = data[sector_offset:sector_offset + 256]
+        for e in range(8):
+            entry = sector_data[e * 32:(e + 1) * 32]
+            if entry[0] == 255:
+                return entries  # End of directory
+            if entry[0] == 0:
+                continue  # Deleted file
+            entries.append(entry)
     return entries
 
 
@@ -38,14 +48,16 @@ def entry_key(entry):
 
 
 def sort_directory(entries):
-    valid = [e for e in entries if is_valid_entry(e)]
-    empty = [e for e in entries if not is_valid_entry(e)]
-    sorted_valid = sorted(valid, key=entry_key)
-    return sorted_valid + empty
+    # All entries are valid (already filtered in read_directory)
+    return sorted(entries, key=entry_key)
 
 
 def write_directory(data, sorted_entries):
+    # Write sorted entries back, pad with unused entries (0xFF)
     dir_bytes = b''.join(sorted_entries)
+    unused_count = NUM_ENTRIES - len(sorted_entries)
+    if unused_count > 0:
+        dir_bytes += bytes([255] + [0]*31) * unused_count
     data = bytearray(data)
     data[DIR_START:DIR_START + DIR_SIZE] = dir_bytes
     return data
@@ -62,7 +74,30 @@ def main():
         data = f.read()
 
     entries = read_directory(data)
+
     sorted_entries = sort_directory(entries)
+
+        # Print summary of valid directory entries (pre-sort)
+    print("Directory Entries (Pre-Sort):")
+    print("#   FILENAME EXT")
+    print("---------------")
+    for idx, entry in enumerate(entries):
+        name = entry[0:8].decode('ascii', errors='ignore').rstrip()
+        ext = entry[8:11].decode('ascii', errors='ignore').rstrip()
+        print(f"{idx:02d}  {name:<8} {ext:<3}")
+    print(f"\nTotal valid entries: {len(entries)}")
+
+    sorted_entries = sort_directory(entries)
+
+    # Print summary of sorted directory entries (post-sort)
+    print("\nDirectory Entries (Sorted):")
+    print("#   FILENAME EXT")
+    print("----------------")
+    for idx, entry in enumerate(sorted_entries):
+        name = entry[0:8].decode('ascii', errors='ignore').rstrip()
+        ext = entry[8:11].decode('ascii', errors='ignore').rstrip()
+        print(f"{idx:02d}  {name:<8} {ext:<3}")
+    print(f"\nTotal sorted entries: {len(sorted_entries)}")
 
     if args.output:
         out_data = write_directory(data, sorted_entries)
