@@ -1,3 +1,6 @@
+** NOTE from a Human: ** GitHub Copilot A.I. wrote these scripts. It was an experiment to see if it could figure out the disk format just by searching for information. DO NOT USE except on backups ;-) since this has not really been tested much (dir should be safe).
+---
+
 # RSDOS-Disk-Tools
 
 A collection of Python utilities for parsing, analyzing, and manipulating RS-DOS disk images for the TRS-80 Color Computer.
