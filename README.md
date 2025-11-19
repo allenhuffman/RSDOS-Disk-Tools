@@ -115,23 +115,6 @@ Summary:
 
 ---
 
-## rsdos_defrag.py
-
-Defragments RS-DOS disk image granules, making file data contiguous and reducing fragmentation.
-
-### Usage
-```
-python rsdos_defrag.py <disk.dsk> [--output <defragged.dsk>] [--inplace]
-```
-
-### Example
-```
-python rsdos_defrag.py TEST.DSK --output defragged.dsk
-python rsdos_defrag.py TEST.DSK --inplace
-```
-
----
-
 ## rsdos_fat.py
 
 Prints a numbered list of files and a FAT table showing which file each granule belongs to.
@@ -157,6 +140,20 @@ FAT Table (granule #: file #):
 00:  -  -  1  2  3  -  4  -  5  -  6  -  7  -  8  -
 10:  9  - 10  - 11  - 12  - 13  - 14  - 15  - 16  -
 ...
+```
+## rsdos_defrag.py
+
+Defragments RS-DOS disk image granules, making file data contiguous and reducing fragmentation.
+
+### Usage
+```
+python rsdos_defrag.py <disk.dsk> [--output <defragged.dsk>] [--inplace]
+```
+
+### Example
+```
+python rsdos_defrag.py TEST.DSK --output defragged.dsk
+python rsdos_defrag.py TEST.DSK --inplace
 ```
 
 #### Before
