@@ -61,3 +61,42 @@ FINISH   BAS 0 B     57600 bytes
 - Directory is read from track 17, sectors 3-11.
 - Only lists valid (non-deleted) entries.
 - Size calculation is based on allocated granules and sectors.
+
+# RSDOS-Disk-Tools
+
+A collection of Python utilities for parsing, analyzing, and manipulating RS-DOS disk images for the TRS-80 Color Computer.
+
+## Features
+- Directory listing with file sizes, types, ASCII/BIN flags
+- FAT table display
+- Granule chain display for each file
+- Free space and unused space calculation
+- Extensible for future RS-DOS disk utilities
+
+## Usage
+```
+python rsdos_dir.py [--fat] [--granules] <disk.dsk>
+```
+
+- `--fat`      Show FAT table
+- `--granules` Show granule chain for each file
+
+## Example Output
+```
+FILENAME EXT TYPE T   SIZE  GRANULES
+------------------------------------
+FILEINFO BAS BPRG B   2751  50,51
+60000    TXT BDAT B  60000  52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,13,10,11,8,9,6,7,4,5,2,3
+
+Free space: 2 granules (4608 bytes)
+Unused space (lost to granule rounding, etc): 20210 bytes
+```
+
+## Future Plans
+- Disk image editing
+- File extraction/insertion
+- Disk integrity checking
+- Support for other Color Computer disk formats
+
+## License
+MIT
