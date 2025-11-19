@@ -123,13 +123,40 @@ Defragments RS-DOS disk image granules, making file data contiguous and reducing
 ```
 python rsdos_defrag.py <disk.dsk> [--output <defragged.dsk>] [--inplace]
 ```
-- `--output <defragged.dsk>`: Write defragmented disk image to a new file
-- `--inplace`: Update the original disk image in place (backup created)
 
 ### Example
 ```
 python rsdos_defrag.py TEST.DSK --output defragged.dsk
 python rsdos_defrag.py TEST.DSK --inplace
+```
+
+---
+
+## rsdos_fat.py
+
+Prints a numbered list of files and a FAT table showing which file each granule belongs to.
+
+### Usage
+```
+python rsdos_fat.py <disk.dsk>
+```
+
+### Features
+- Numbered file list from the directory
+- FAT table with each granule showing the file number it belongs to (or '-' for free/unassigned)
+
+### Example Output
+```
+File List:
+1. FILE1.TXT
+2. FILE2.TXT
+3. MAKEFILE.BAS
+...
+
+FAT Table (granule #: file #):
+00:  -  -  1  2  3  -  4  -  5  -  6  -  7  -  8  -
+10:  9  - 10  - 11  - 12  - 13  - 14  - 15  - 16  -
+...
 ```
 
 #### Before
