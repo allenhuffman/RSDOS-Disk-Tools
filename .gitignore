@@ -1,1 +1,2 @@
-TEST.DSK.bak
+# Ignore backup files
+*.bak
