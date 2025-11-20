@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-rsdos_dirsort.py - Sort RS-DOS directory entries alphabetically in a disk image
+rsdos_sortdir.py - Sort RS-DOS directory entries alphabetically in a disk image
 
 Usage:
-  python rsdos_dirsort.py <disk.dsk> [--output <new.dsk>] [--inplace]
+  python rsdos_sortdir.py <disk.dsk> [--output <new.dsk>] [--inplace]
 
 Options:
   --output <new.dsk>   Write sorted disk image to a new file
@@ -63,6 +63,17 @@ def write_directory(data, sorted_entries):
     return data
 
 
+def show_directory(entries, title):
+    print(title)
+    print("#   FILENAME EXT")
+    print("----------------")
+    for idx, entry in enumerate(entries):
+        name = entry[0:8].decode('ascii', errors='ignore').rstrip()
+        ext = entry[8:11].decode('ascii', errors='ignore').rstrip()
+        print(f"{idx:02d}  {name:<8} {ext:<3}")
+    print(f"\nTotal entries: {len(entries)}")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Sort RS-DOS directory entries alphabetically.")
     parser.add_argument("disk", help="Disk image file (.dsk)")
@@ -74,30 +85,10 @@ def main():
         data = f.read()
 
     entries = read_directory(data)
-
     sorted_entries = sort_directory(entries)
 
-        # Print summary of valid directory entries (pre-sort)
-    print("Directory Entries (Pre-Sort):")
-    print("#   FILENAME EXT")
-    print("---------------")
-    for idx, entry in enumerate(entries):
-        name = entry[0:8].decode('ascii', errors='ignore').rstrip()
-        ext = entry[8:11].decode('ascii', errors='ignore').rstrip()
-        print(f"{idx:02d}  {name:<8} {ext:<3}")
-    print(f"\nTotal valid entries: {len(entries)}")
-
-    sorted_entries = sort_directory(entries)
-
-    # Print summary of sorted directory entries (post-sort)
-    print("\nDirectory Entries (Sorted):")
-    print("#   FILENAME EXT")
-    print("----------------")
-    for idx, entry in enumerate(sorted_entries):
-        name = entry[0:8].decode('ascii', errors='ignore').rstrip()
-        ext = entry[8:11].decode('ascii', errors='ignore').rstrip()
-        print(f"{idx:02d}  {name:<8} {ext:<3}")
-    print(f"\nTotal sorted entries: {len(sorted_entries)}")
+    show_directory(entries, "Directory Entries (Pre-Sort):")
+    show_directory(sorted_entries, "\nDirectory Entries (Sorted):")
 
     if args.output:
         out_data = write_directory(data, sorted_entries)
