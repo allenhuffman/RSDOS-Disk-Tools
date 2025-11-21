@@ -1,0 +1,108 @@
+                           68    1 Big
+                           Files File
+Track  0 +------------+
+         | Granule  0 |    64    66
+         | Granule  1 |    65    67
+Track  1 +------------+
+         | Granule  2 |    60    64
+         | Granule  3 |    61    65
+Track  2 +------------+
+         | Granule  4 |    56    62
+         | Granule  5 |    57    63
+Track  3 +------------+
+         | Granule  6 |    52    60
+         | Granule  7 |    53    61
+Track  4 +------------+
+         | Granule  8 |    48    58
+         | Granule  9 |    49    59
+Track  5 +------------+
+         | Granule 10 |    44    56
+         | Granule 11 |    45    57
+Track  6 +------------+
+         | Granule 12 |    40    54
+         | Granule 13 |    41    55
+Track  7 +------------+
+         | Granule 14 |    36    52
+         | Granule 15 |    37    53
+Track  8 +------------+
+         | Granule 16 |    32    50
+         | Granule 17 |    33    51
+Track  9 +------------+
+         | Granule 18 |    28    48
+         | Granule 19 |    29    49
+Track 10 +------------+
+         | Granule 20 |    24    46
+         | Granule 21 |    25    47
+Track 11 +------------+
+         | Granule 22 |    20    44
+         | Granule 23 |    21    45
+Track 12 +------------+
+         | Granule 24 |    16    42
+         | Granule 25 |    17    43
+Track 13 +------------+
+         | Granule 26 |    12    40
+         | Granule 27 |    13    41
+Track 14 +------------+
+         | Granule 28 |    8     38
+         | Granule 29 |    9     39
+Track 15 +------------+
+         | Granule 30 |    4     36
+         | Granule 31 |    5     37
+Track 16 +------------+
+         | Granule 32 |    0     0
+         | Granule 33 |    1     1
+Track 17 +------------+
+         | FAT &      |
+         | Directory  |
+Track 18 +------------+
+         | Granule 34 |    2     2
+         | Granule 35 |    3     3
+Track 19 +------------+
+         | Granule 36 |    6     4
+         | Granule 37 |    7     5
+Track 20 +------------+
+         | Granule 38 |    10    6
+         | Granule 39 |    11    7
+Track 21 +------------+
+         | Granule 40 |    14    8
+         | Granule 41 |    15    9
+Track 22 +------------+
+         | Granule 42 |    18    10
+         | Granule 43 |    19    11
+Track 23 +------------+
+         | Granule 44 |    22    12
+         | Granule 45 |    23    13
+Track 24 +------------+
+         | Granule 46 |    26    14
+         | Granule 47 |    27    15
+Track 25 +------------+
+         | Granule 48 |    30    16
+         | Granule 49 |    31    17
+Track 26 +------------+
+         | Granule 50 |    34    18
+         | Granule 51 |    35    19
+Track 27 +------------+
+         | Granule 52 |    38    20
+         | Granule 53 |    39    21
+Track 28 +------------+
+         | Granule 54 |    42    22
+         | Granule 55 |    43    23
+Track 29 +------------+
+         | Granule 56 |    46    24
+         | Granule 57 |    47    25
+Track 30 +------------+
+         | Granule 58 |    50    26
+         | Granule 59 |    51    27
+Track 31 +------------+
+         | Granule 60 |    54    28
+         | Granule 61 |    55    29
+Track 32 +------------+
+         | Granule 62 |    58    30
+         | Granule 63 |    59    31
+Track 33 +------------+
+         | Granule 64 |    62    32
+         | Granule 65 |    63    33
+Track 34 +------------+
+         | Granule 66 |    66    34
+         | Granule 67 |    67    35
+         +------------+ 
