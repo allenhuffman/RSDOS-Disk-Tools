@@ -65,25 +65,15 @@ def get_file_granule_chain(fat, first_gran):
     chain = []
     gn = first_gran
     visited = set()
-    max_chain = FAT_SIZE
     while True:
         if gn > 67 or gn < 0:
-            print(f"  Chain break: granule {gn} out of bounds.")
             break
         if gn in visited:
-            print(f"  Chain break: loop detected at granule {gn}.")
             break
         chain.append(gn)
         visited.add(gn)
-        if len(chain) > max_chain:
-            print(f"  Chain break: chain too long (> {max_chain} granules).")
-            break
         gv = fat[gn]
-        if gv == 0:
-            # RS-DOS: FAT value 0 means end of file, only bytes_last used
-            break
         if gv >= 192:
-            # RS-DOS end-of-chain marker; do not follow to next granule
             break
         gn = gv
     return chain
@@ -112,7 +102,6 @@ def main():
         # Mark granules as used
         for g in chain:
             granule_usage[g] += 1
-        # ...existing code...
     # Check for orphaned and multiply-used granules
     orphaned = [i for i in range(FAT_SIZE) if fat[i] != 255 and granule_usage[i] == 0]
     multiply_used = [i for i, u in enumerate(granule_usage) if u > 1]

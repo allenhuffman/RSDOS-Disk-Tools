@@ -54,25 +54,28 @@ def parse_directory(data, fat):
 
             # Calculate file size in bytes (RS-DOS logic)
             if 0 <= first_gran <= 67:
+                chain = get_granule_chain(fat, first_gran)
                 size = 0
-                gn = first_gran  # 0-based index for FAT
-                while True:
-                    if gn > 67 or gn < 0:
-                        break  # Invalid granule
-                    gv = fat[gn]
-                    if gv == 0:
-                        # Last granule, only bytes_last used
-                        size += bytes_last
-                        break
-                    elif gv < 192:
-                        size += 2304
-                        gn = gv  # Next granule
-                    else:
-                        sectors_used = gv & 0x1F
-                        if sectors_used > 0:
-                            sectors_used -= 1
-                        size += sectors_used * 256 + bytes_last
-                        break
+                if chain:
+                    for i, gn in enumerate(chain):
+                        if i == len(chain) - 1:
+                            gv = fat[gn]
+                            if gv == 0 and bytes_last == 256:
+                                size += 2304
+                            elif gv == 0:
+                                size += bytes_last
+                            elif gv >= 192:
+                                sectors_used = gv & 0x1F
+                                if sectors_used == 9 and bytes_last == 256:
+                                    size += 2304
+                                elif sectors_used > 0:
+                                    size += (sectors_used * 256) + bytes_last
+                                else:
+                                    size += bytes_last
+                            else:
+                                size += 2304
+                        else:
+                            size += 2304
             else:
                 continue  # Invalid granule number
 
@@ -96,14 +99,17 @@ def print_fat(fat):
 def get_granule_chain(fat, first_gran):
     chain = []
     gn = first_gran  # 0-based index
+    max_chain = 68
     while True:
         if gn > 67 or gn < 0:
             break
-        chain.append(gn)  # Show as 0-based granule number
+        chain.append(gn)
         gv = fat[gn]
         if gv >= 192:
             break
-        gn = gv  # Next granule
+        gn = gv
+        if len(chain) > max_chain:
+            break
     return chain
 
 def main():
@@ -161,12 +167,24 @@ def main():
     # Calculate free space
     free_granules = sum(1 for g in fat if g == 255)
     free_bytes = free_granules * 2304
-    print(f"\nFree space: {free_granules} granules ({free_bytes} bytes)")
 
-    # Calculate unused space (disk capacity - sum of file sizes - free space)
-    disk_capacity = 68 * 2304  # 68 granules per disk
-    used_bytes = sum(entry['size'] for entry in entries)
-    unused_bytes = disk_capacity - used_bytes - free_bytes
-    print(f"Unused space (lost to granule rounding, etc): {unused_bytes} bytes")
+    # Calculate unused space: leftover bytes in last granule of each file
+    unused_bytes = 0
+    for entry in entries:
+        chain = get_granule_chain(fat, entry['first_gran'])
+        if chain:
+            last_gran = chain[-1]
+            gv = fat[last_gran]
+            if gv >= 192:
+                sectors_used = gv & 0x1F
+                if sectors_used > 0:
+                    actual_bytes = (sectors_used - 1) * 256 + entry['size']
+                else:
+                    actual_bytes = entry['size']
+                unused_bytes += 2304 - actual_bytes if actual_bytes < 2304 else 0
+            elif entry['size'] == 0:
+                unused_bytes += 2304
+    print(f"\nFree space: {free_granules} granules ({free_bytes} bytes)")
+    print(f"Unused space (leftover in last granule of files): {unused_bytes} bytes")
 if __name__ == "__main__":
     main()

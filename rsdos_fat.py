@@ -12,7 +12,8 @@ Features:
 import sys
 
 def get_fat(data):
-    fat_offset = 17 * 18 * 256 + (2 - 1) * 256  # 78848
+    # Track is 0-based, sector is 1-based
+    fat_offset = (17 * 18 + (2 - 1)) * 256  # Track 17 (0-based), sector 2 (1-based)
     return bytearray(data[fat_offset:fat_offset + 68])
 
 def read_directory(data):
@@ -32,19 +33,25 @@ def read_directory(data):
 def get_file_granule_chain(fat, first_gran):
     chain = []
     gn = first_gran
-    visited = set()
+    max_chain = 68
     while True:
         if gn > 67 or gn < 0:
             break
-        if gn in visited:
-            break
         chain.append(gn)
-        visited.add(gn)
         gv = fat[gn]
-        if gv == 0 or gv >= 192:
+        if gv >= 192:
             break
         gn = gv
+        if len(chain) > max_chain:
+            break
     return chain
+
+def print_fat_debug(fat):
+    for i in range(0, 68, 16):
+        row = []
+        for j in range(i, min(i+16, 68)):
+            row.append(f"{fat[j]:02X}")
+        print(f"{i:02X}: {' '.join(row)}")
 
 def main():
     if len(sys.argv) < 2:
@@ -53,7 +60,12 @@ def main():
     filename = sys.argv[1]
     with open(filename, 'rb') as f:
         data = f.read()
+    # Track is 0-based, sector is 1-based
+    fat_offset = (17 * 18 + (2 - 1)) * 256  # Track 17 (0-based), sector 2 (1-based)
     fat = get_fat(data)
+    print("FAT Table (hex values):")
+    print_fat_debug(fat)
+    print()  # Blank line for readability
     entries = read_directory(data)
     file_gran_map = ['-' for _ in range(68)]
     print("File List:")
