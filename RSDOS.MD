@@ -42,7 +42,8 @@ Track X
 
 RS-DOS divides the disk up into half-track sized granules (2304 bytes each) numbered 0-67.
 
-Granules 0-33 are on Tracks 0-17.
+Granules 0-33 are on Tracks 0-16.
+Track 17 is reserved for FAT and directory and does not contain any granules.
 Granules 34-67 are on Tracks 18-34.
 
 Any routines accessing granules need to take this into consideration.
@@ -60,7 +61,7 @@ Track 16 +------------+
          | Granule 32 | - Sectors 1-9   (2304 bytes)
          | Granule 33 | - Sectors 10-18 (2304 bytes)
 Track 17 +------------+
-         | FAT &      | - 4608 bytes
+         | FAT &      | - 4608 bytes (no granules)
          | Directory  |
 Track 18 +------------+
          | Granule 34 | - Sectors 1-9   (2304 bytes)
